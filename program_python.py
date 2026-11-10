@@ -1,5 +1,5 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import pandas as pd #py -m pip install pandas
+import matplotlib.pyplot as plt #py -m pip install matplotlib
 
 data = {
     'ID_Produk': [

@@ -1,16 +1,19 @@
-```r
+# ==========================================
+# 1. MEMBUAT DATASET 17 DATA
+# ==========================================
+
 ID_Produk <- c(
-  'P001', 'P002', 'P003', 'P004', 'P002',
-  'P005', 'P006', 'P007', 'P008', 'P009',
-  'P010', 'P011', 'P012', 'P013', 'P014',
-  'P015', 'P001 '
+  "P001", "P002", "P003", "P004", "P002",
+  "P005", "P006", "P007", "P008", "P009",
+  "P010", "P011", "P012", "P013", "P014",
+  "P015", "P001 "
 )
 
 Nama_Produk <- c(
-  'Laptop', 'Mouse', 'Keyboard', 'Monitor', 'Mouse',
-  'Printer', 'Speaker', 'Webcam', 'Headset', 'Flashdisk',
-  'Harddisk', 'Router', 'Smartphone', 'Tablet', NA,
-  'Tablet', 'Laptop'
+  "Laptop", "Mouse", "Keyboard", "Monitor", "Mouse",
+  "Printer", "Speaker", "Webcam", "Headset", "Flashdisk",
+  "Harddisk", "Router", "Smartphone", "Tablet", NA,
+  "Tablet", "Laptop"
 )
 
 Jumlah_Terjual <- c(
@@ -28,14 +31,20 @@ Harga_Satuan <- c(
 )
 
 df_sebelum <- data.frame(
-  ID_Produk, Nama_Produk, Jumlah_Terjual, Harga_Satuan
+  ID_Produk,
+  Nama_Produk,
+  Jumlah_Terjual,
+  Harga_Satuan
 )
+
+# ==========================================
+# 2. DATASET SEBELUM CLEANING
+# ==========================================
 
 print("=== DATASET SEBELUM CLEANING ===")
 print(df_sebelum)
 
 cat("\n------------------------------------------\n\n")
-
 
 write.csv(
   df_sebelum,
@@ -43,6 +52,23 @@ write.csv(
   row.names = FALSE
 )
 
+# ==========================================
+# 3. CEK MISSING VALUE
+# ==========================================
+
+jumlah_missing <- sum(is.na(df_sebelum))
+
+cat(
+  paste(
+    "Jumlah missing value ditemukan:",
+    jumlah_missing,
+    "\n\n"
+  )
+)
+
+# ==========================================
+# 4. CEK DUPLIKAT
+# ==========================================
 
 jumlah_duplikat <- sum(duplicated(df_sebelum))
 
@@ -54,27 +80,35 @@ cat(
   )
 )
 
+# ==========================================
+# 5. HAPUS DUPLIKAT
+# ==========================================
 
 df_sesudah <- df_sebelum[!duplicated(df_sebelum), ]
 
-
-df_sesudah$ID_Produk <- trimws(df_sesudah$ID_Produk)
-
+# ==========================================
+# 6. HAPUS MISSING VALUE
+# ==========================================
 
 df_sesudah <- na.omit(df_sesudah)
 
+# ==========================================
+# 7. HAPUS NILAI TIDAK VALID
+# ==========================================
 
 df_sesudah <- df_sesudah[
   df_sesudah$Jumlah_Terjual >= 0 &
   df_sesudah$Harga_Satuan > 0,
 ]
 
+# ==========================================
+# 8. DATASET SESUDAH CLEANING
+# ==========================================
 
 print("=== DATASET SESUDAH CLEANING ===")
 print(df_sesudah)
 
 cat("\n------------------------------------------\n\n")
-
 
 write.csv(
   df_sesudah,
@@ -82,27 +116,40 @@ write.csv(
   row.names = FALSE
 )
 
+# ==========================================
+# 9. TRANSFORMASI TOTAL PENJUALAN
+# ==========================================
 
 df_sesudah$Total_Penjualan <-
-  df_sesudah$Jumlah_Terjual * df_sesudah$Harga_Satuan
+  df_sesudah$Jumlah_Terjual *
+  df_sesudah$Harga_Satuan
 
 print("=== HASIL TRANSFORMASI DATA ===")
 
 print(
-  df_sesudah[, c(
-    'Nama_Produk',
-    'Jumlah_Terjual',
-    'Harga_Satuan',
-    'Total_Penjualan'
-  )]
+  df_sesudah[
+    ,
+    c(
+      "Nama_Produk",
+      "Jumlah_Terjual",
+      "Harga_Satuan",
+      "Total_Penjualan"
+    )
+  ]
 )
 
 cat("\n------------------------------------------\n\n")
 
+# ==========================================
+# 10. MEMBUAT DIAGRAM BATANG
+# ==========================================
+
+# Jalankan sekali jika ggplot2 belum terinstall:
+# install.packages("ggplot2")
 
 library(ggplot2)
 
-ggplot(
+grafik <- ggplot(
   df_sesudah,
   aes(
     x = Nama_Produk,
@@ -122,11 +169,28 @@ ggplot(
   ) +
   theme_minimal()
 
+print(grafik)
+
+# Simpan diagram sebagai PNG
+ggsave(
+  "diagram_total_penjualan_r.png",
+  plot = grafik,
+  width = 10,
+  height = 6,
+  dpi = 300
+)
+
+# ==========================================
+# 11. MENENTUKAN PRODUK TERBESAR
+# ==========================================
 
 produk_terbesar <- df_sesudah[
   which.max(df_sesudah$Total_Penjualan),
 ]
 
+# ==========================================
+# 12. KESIMPULAN
+# ==========================================
 
 print("=== KESIMPULAN ANALISIS ===")
 
@@ -149,7 +213,10 @@ cat(
 cat(
   paste(
     "Harga Satuan: Rp",
-    format(produk_terbesar$Harga_Satuan, big.mark = "."),
+    format(
+      produk_terbesar$Harga_Satuan,
+      big.mark = "."
+    ),
     "\n"
   )
 )
@@ -157,8 +224,10 @@ cat(
 cat(
   paste(
     "Total Penjualan: Rp",
-    format(produk_terbesar$Total_Penjualan, big.mark = "."),
+    format(
+      produk_terbesar$Total_Penjualan,
+      big.mark = "."
+    ),
     "\n"
   )
 )
-```
